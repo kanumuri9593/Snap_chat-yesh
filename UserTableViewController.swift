@@ -12,11 +12,13 @@ import Parse
 
 
 
-class UserTableViewController: UITableViewController {
+class UserTableViewController: UITableViewController ,UINavigationControllerDelegate, UIImagePickerControllerDelegate {
     
    
     
     var usernames = [String]()
+    
+    var recipientUsername = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -59,6 +61,55 @@ class UserTableViewController: UITableViewController {
         cell.textLabel?.text = usernames[indexPath.row]
         
         return cell
+    }
+    
+    override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
+        
+        self.recipientUsername = usernames[indexPath.row]
+        
+        var image = UIImagePickerController()
+        
+        image.delegate = self
+        
+        image.sourceType = UIImagePickerControllerSourceType.PhotoLibrary
+        
+        image.allowsEditing = false
+        
+        self.presentViewController(image, animated: true, completion: nil)
+        
+        
+        
+        
+        
+    }
+    
+    
+    func imagePickerController(picker: UIImagePickerController, didFinishPickingImage image: UIImage, editingInfo: [String : AnyObject]?) {
+        
+        
+        self.dismissViewControllerAnimated(true, completion: nil)
+        
+        var iamgeTosend = PFObject(className: "image")
+        
+        
+        iamgeTosend["photo"] = PFFile(name: "photo.jpg", data: UIImageJPEGRepresentation(image, 0.5)!)
+        
+        
+        iamgeTosend["senderUsername"] = PFUser.currentUser()?.username!
+        
+        iamgeTosend["recipientUsername"] = self.recipientUsername
+        
+        
+        iamgeTosend.saveInBackground()
+        
+        
+        
+        
+        
+        
+        
+        
+        
     }
     
     
